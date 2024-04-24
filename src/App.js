@@ -31,9 +31,18 @@ import PageNotFound from './pages/404';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import UserOrders from './features/user/components/UserOrders';
 import UserOrdersPage from './pages/UserOrdersPage';
-
+import AdminOrdersPage from './pages/AdminOrdersPage';
+import { positions, Provider } from 'react-alert';
+import AlertTemplate from 'react-alert-template-basic';
 import UserProfilePage from './pages/UserProfilePage';
 import { fetchLoggedInUserAsync } from './features/user/userSlice';
+
+const options = {
+  timeout: 5000,
+  position: positions.BOTTOM_LEFT,
+};
+
+
 
 const router = createBrowserRouter([
   {
@@ -101,6 +110,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: '/admin/orders',
+    element: (
+      <ProtectedAdmin>
+        <AdminOrdersPage></AdminOrdersPage>
+      </ProtectedAdmin>
+    ),
+  },
+  {
     path: '/admin/product-form/edit/:id',
     element: (
       <ProtectedAdmin>
@@ -111,19 +128,25 @@ const router = createBrowserRouter([
   {
     path: '/order-success/:id',
     element: (
-      <OrderSuccessPage></OrderSuccessPage>
+      <Protected>
+        <OrderSuccessPage></OrderSuccessPage>{' '}
+      </Protected>
     ),
   },
   {
     path: '/orders',
     element: (
-      <UserOrdersPage></UserOrdersPage>
-      ),
+      <Protected>
+        <UserOrdersPage></UserOrdersPage>{' '}
+      </Protected>
+    ),
   },
   {
     path: '/profile',
     element: (
-      <UserProfilePage></UserProfilePage>
+      <Protected>
+        <UserProfilePage></UserProfilePage>{' '}
+      </Protected>
     ),
   },
   {
@@ -142,14 +165,17 @@ function App() {
 
   useEffect(()=>{
     if(user){
-      dispatch(fetchItemsByUserIdAsync(user.id))
-      dispatch(fetchLoggedInUserAsync(user.id))
+      dispatch(fetchItemsByUserIdAsync());
+       
+      dispatch(fetchLoggedInUserAsync());
     }
   },[dispatch, user])
   return (
     <>
       <div className="App">
-        <RouterProvider router={router} />
+      <Provider template={AlertTemplate} {...options}>
+          <RouterProvider router={router} />
+        </Provider>
         {/* Link must be inside the Provider */}
       </div>
     </>
